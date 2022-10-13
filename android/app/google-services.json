@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "419416501627",
+    "project_id": "percent-poc",
+    "storage_bucket": "percent-poc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:419416501627:android:7a0d10dd0c9553e664a1de",
+        "android_client_info": {
+          "package_name": "com.percentpoc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "419416501627-010rn5d0lhj1o01ju085uoigs1a0jrjp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGCrupxTs-lMySF8jLX7Irt2ARVZFPPGs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "419416501627-010rn5d0lhj1o01ju085uoigs1a0jrjp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "419416501627-h7om7ljfjik19mh67j74febu1pktl17v.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.percentpoc.merixstudio"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
