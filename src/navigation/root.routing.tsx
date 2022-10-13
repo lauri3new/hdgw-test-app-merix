@@ -7,7 +7,11 @@ const Stack = createNativeStackNavigator();
 export const RootRouting = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="NonProfitSearch" component={NonProfitSearch} />
+      <Stack.Screen
+        name="NonProfitSearch"
+        component={NonProfitSearch}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };

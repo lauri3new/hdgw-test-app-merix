@@ -1,12 +1,23 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { RootRouting } from './src/navigation/root.routing';
+import { NativeBaseProvider } from 'native-base';
+
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: 'white',
+  },
+};
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <RootRouting />
-    </NavigationContainer>
+    <NativeBaseProvider>
+      <NavigationContainer theme={MyTheme}>
+        <RootRouting />
+      </NavigationContainer>
+    </NativeBaseProvider>
   );
 };
 
