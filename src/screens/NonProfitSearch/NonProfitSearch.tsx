@@ -14,9 +14,21 @@ import debounce from 'lodash.debounce';
 import { NonProfitSearchResults } from './NonProfitSearchResults';
 import { TextInput } from 'react-native';
 
+const fetchNonProfits = async (params: { query: string; page: number }) => {
+  const response = await request.get('/organisations', {
+    params,
+  });
+
+  return response;
+};
+
 export const NonProfitSearch = () => {
   const [query, setQuery] = useState('');
   const [data, setData] = useState<Array<INonProfit>>([]);
+  const [page, setPage] = useState(1);
+  const [resultsTotal, setResultsTotal] = useState();
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const debouncedHandleChange = debounce((text: string) => setQuery(text), 200);
   const inputRef = useRef<TextInput>();
   const safeAreaProps = useSafeArea({ safeAreaTop: true });
@@ -26,21 +38,42 @@ export const NonProfitSearch = () => {
     inputRef.current?.clear();
   };
 
+  const fetchNextPage = async () => {
+    setLoadingMore(true);
+    try {
+      const response = await fetchNonProfits({
+        query,
+        page: page + 1,
+      });
+      setPage(page + 1);
+      setData(d => [...d, ...response.data.data]);
+    } catch (error) {
+      console.log(error);
+    }
+    setLoadingMore(false);
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetch = async () => {
       try {
-        const response = await request.get('/organisations', {
-          params: { query },
+        const response = await fetchNonProfits({
+          query,
+          page: 1,
         });
+        setPage(1);
         setData(response.data.data);
+        setResultsTotal(response.data.totalResults);
+        setLoading(false);
       } catch (error) {
         console.log(error);
       }
     };
     if (query) {
-      fetchData();
+      setLoading(true);
+      fetch();
     } else {
       setData([]);
+      setLoading(false);
     }
   }, [query]);
 
@@ -72,7 +105,13 @@ export const NonProfitSearch = () => {
           onChangeText={debouncedHandleChange}
         />
       </Container>
-      <NonProfitSearchResults data={data} />
+      <NonProfitSearchResults
+        data={data}
+        loading={loading}
+        fetchNextPage={fetchNextPage}
+        loadingMore={loadingMore}
+        resultsTotal={resultsTotal}
+      />
     </>
   );
 };
