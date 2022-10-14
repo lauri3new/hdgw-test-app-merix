@@ -4,12 +4,16 @@ import {
   Box,
   FlatList,
   HStack,
+  Pressable,
   Spinner,
   Text,
   VStack,
 } from 'native-base';
-import { INonProfit } from '../../interfaces/nonProfit';
+import { INonProfit } from '../../interfaces/nonProfit.interface';
 import { ListRenderItem, StyleSheet } from 'react-native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamsList } from '../../navigation/root.routing';
+import { createAvatarFallbackText } from '../../utils/string';
 
 interface Props {
   data: Array<INonProfit>;
@@ -26,40 +30,43 @@ export const NonProfitSearchResults: React.FC<Props> = ({
   loadingMore,
   resultsTotal,
 }) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamsList>>();
+
   const renderItem: ListRenderItem<INonProfit> = ({ item, index }) => {
-    const splitName = item.name.split(' ');
+    const fallback = createAvatarFallbackText(item.name);
     const isLast = index === data.length - 1;
-    const fallback = splitName
-      .map(name => name[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase();
+
     return (
-      <HStack
-        ml={5}
-        py={3}
-        borderBottomWidth={isLast ? 0 : StyleSheet.hairlineWidth}
-        borderBottomColor="gray.300"
-        alignItems="center"
+      <Pressable
+        onPress={() => navigation.navigate('NonProfitDetails', { id: item.id })}
+        _pressed={{ bg: 'gray.100' }}
       >
-        <Avatar
-          bg="gray.100"
-          mr={2}
-          borderRadius="sm"
-          source={{ uri: item.logo }}
-          _text={{ color: 'gray.400' }}
+        <HStack
+          ml={5}
+          py={3}
+          borderBottomWidth={isLast ? 0 : StyleSheet.hairlineWidth}
+          borderBottomColor="gray.300"
+          alignItems="center"
         >
-          {fallback}
-        </Avatar>
-        <VStack flex={1} pr={2}>
-          <Text noOfLines={1} bold>
-            {item.name}
-          </Text>
-          <Text fontSize="xs" color="gray.400">
-            {item.address || 'No address data'}
-          </Text>
-        </VStack>
-      </HStack>
+          <Avatar
+            bg="gray.100"
+            mr={2}
+            borderRadius="sm"
+            source={{ uri: item.logo }}
+            _text={{ color: 'gray.400' }}
+          >
+            {fallback}
+          </Avatar>
+          <VStack flex={1} pr={2}>
+            <Text noOfLines={1} bold>
+              {item.name}
+            </Text>
+            <Text fontSize="xs" color="gray.400">
+              {item.address || 'No address data'}
+            </Text>
+          </VStack>
+        </HStack>
+      </Pressable>
     );
   };
 

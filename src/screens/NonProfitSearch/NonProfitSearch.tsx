@@ -8,19 +8,11 @@ import {
   Container,
   useSafeArea,
 } from 'native-base';
-import { request } from '../../utils/request';
-import { INonProfit } from '../../interfaces/nonProfit';
+import { INonProfit } from '../../interfaces/nonProfit.interface';
 import debounce from 'lodash.debounce';
 import { NonProfitSearchResults } from './NonProfitSearchResults';
 import { TextInput } from 'react-native';
-
-const fetchNonProfits = async (params: { query: string; page: number }) => {
-  const response = await request.get('/organisations', {
-    params,
-  });
-
-  return response;
-};
+import { fetchNonProfits } from '../../api/nonProfit.api';
 
 export const NonProfitSearch = () => {
   const [query, setQuery] = useState('');
