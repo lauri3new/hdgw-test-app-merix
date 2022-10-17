@@ -1,4 +1,8 @@
-import { RouteProp } from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+} from '@react-navigation/native';
 import {
   Avatar,
   Button,
@@ -17,6 +21,7 @@ import { RootStackParamsList } from '../../navigation/root.routing';
 import { createAvatarFallbackText } from '../../utils/string';
 import NonProfitDetailsHeader from './NonProfitDetailsHeader';
 import { formatDistance } from 'date-fns';
+import { donationSessionRequest } from '../../utils/request';
 
 interface DonationDetails {
   name: string;
@@ -25,14 +30,17 @@ interface DonationDetails {
 }
 
 interface Props {
-  route: RouteProp<RootStackParamsList>;
+  route: RouteProp<RootStackParamsList, 'NonProfitDetails'>;
 }
 
 export const NonProfitDetails: React.FC<Props> = ({ route }) => {
   const insets = useSafeAreaInsets();
-  const id = route.params?.id;
+  const id = route.params.id;
+  console.log('🚀 ~ file: NonProfitDetails.tsx ~ line 39 ~ id', id);
   const [loading, setLoading] = useState(true);
+  const [loadingDonation, setLoadingDonation] = useState(false);
   const [details, setDetails] = useState<INonProfitDetails>();
+  const navigation = useNavigation<NavigationProp<RootStackParamsList>>();
 
   useEffect(() => {
     const fetch = async () => {
@@ -58,6 +66,30 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
   if (!details) {
     return <Text>Couldn't load the data</Text>;
   }
+
+  const handleDonationPress = async () => {
+    setLoadingDonation(true);
+    try {
+      const response = await donationSessionRequest.post('/donation-sessions', {
+        organisationId: details.id,
+        language: 'en-GB',
+        currency: 'CHF',
+        userId: 'sandbox_user_000000CTgmzOgdxoLq1ad9M0QWYr2',
+      });
+
+      console.log(
+        '🚀 ~ file: NonProfitDetails.tsx ~ line 80 ~ handleDonationPress ~ response.data.data.url',
+        response.data.data,
+      );
+
+      navigation.navigate('NonProfitDetailsSession', {
+        uri: response.data.data.url,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    setLoadingDonation(false);
+  };
 
   const renderItem: ListRenderItem<DonationDetails> = ({ item }) => {
     return (
@@ -100,6 +132,8 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
         keyExtractor={keyExtractor}
       />
       <Button
+        _pressed={{ opacity: 0.8 }}
+        onPress={handleDonationPress}
         position="absolute"
         left={5}
         right={5}
@@ -108,6 +142,7 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
         size="lg"
         borderRadius="xl"
         _text={{ fontWeight: 'bold' }}
+        isLoading={loadingDonation}
       >
         Donate
       </Button>

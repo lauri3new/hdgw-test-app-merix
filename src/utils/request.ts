@@ -11,3 +11,6 @@ const createAxiosRequestObject = (config?: AxiosRequestConfig<any>) =>
   axios.create({ ...defaultAxiosConfig, ...config });
 
 export const request = createAxiosRequestObject();
+export const donationSessionRequest = createAxiosRequestObject({
+  headers: { Authorization: Config.PERCENT_SECRET_API_KEY },
+});
