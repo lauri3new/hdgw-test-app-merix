@@ -15,6 +15,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { ListRenderItem } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import firestore from '@react-native-firebase/firestore';
 import { fetchNonProfitsDetails } from '../../api/nonProfit.api';
 import { INonProfitDetails } from '../../interfaces/nonProfit.interface';
 import { RootStackParamsList } from '../../navigation/root.routing';
@@ -22,11 +23,14 @@ import { createAvatarFallbackText } from '../../utils/string';
 import NonProfitDetailsHeader from './NonProfitDetailsHeader';
 import { formatDistance } from 'date-fns';
 import { donationSessionRequest } from '../../utils/request';
+import { TEST_USER_ID } from '../../utils/consts';
 
 interface DonationDetails {
-  name: string;
+  id: string;
+  name?: string;
   amount: number;
   date: string;
+  currencyCode: string;
 }
 
 interface Props {
@@ -36,11 +40,15 @@ interface Props {
 export const NonProfitDetails: React.FC<Props> = ({ route }) => {
   const insets = useSafeAreaInsets();
   const id = route.params.id;
-  console.log('🚀 ~ file: NonProfitDetails.tsx ~ line 39 ~ id', id);
   const [loading, setLoading] = useState(true);
   const [loadingDonation, setLoadingDonation] = useState(false);
   const [details, setDetails] = useState<INonProfitDetails>();
   const navigation = useNavigation<NavigationProp<RootStackParamsList>>();
+  const [donations, setDonations] = useState<Array<DonationDetails>>([]);
+  console.log(
+    '🚀 ~ file: NonProfitDetails.tsx ~ line 46 ~ donations',
+    donations,
+  );
 
   useEffect(() => {
     const fetch = async () => {
@@ -59,6 +67,36 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
     fetch();
   }, [id]);
 
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('donation')
+      .where('data.eventData.organisationId', '==', id)
+      .onSnapshot(querySnapshot => {
+        const data = querySnapshot.docs.map(doc => {
+          console.log(
+            '🚀 ~ file: NonProfitDetails.tsx ~ line 77 ~ data ~ doc.data().data',
+            doc.data().data,
+          );
+          const item = doc.data().data;
+          return {
+            id: doc.id,
+            name: item.eventData?.firstName || 'Anonymous',
+            amount: item.eventData?.amount,
+            date: item.eventData?.createdAt,
+            currencyCode: item.eventData.currencyCode,
+          };
+        });
+        console.log(
+          '🚀 ~ file: NonProfitDetails.tsx ~ line 85 ~ data ~ data',
+          data,
+        );
+
+        setDonations(data);
+      });
+
+    return () => subscriber();
+  }, [id]);
+
   if (loading) {
     return <Spinner />;
   }
@@ -74,13 +112,8 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
         organisationId: details.id,
         language: 'en-GB',
         currency: 'CHF',
-        userId: 'sandbox_user_000000CTgmzOgdxoLq1ad9M0QWYr2',
+        userId: TEST_USER_ID,
       });
-
-      console.log(
-        '🚀 ~ file: NonProfitDetails.tsx ~ line 80 ~ handleDonationPress ~ response.data.data.url',
-        response.data.data,
-      );
 
       navigation.navigate('NonProfitDetailsSession', {
         uri: response.data.data.url,
@@ -95,10 +128,10 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
     return (
       <VStack>
         <HStack pl={5} pb={5}>
-          <Avatar mr={3}>{createAvatarFallbackText(item.name)}</Avatar>
+          <Avatar mr={3}>{createAvatarFallbackText(item?.name || '-')}</Avatar>
           <VStack>
             <Text bold fontSize="md">
-              Donated ${item.amount} USD
+              Donated {(item.amount / 100).toFixed(2)} {item.currencyCode}
             </Text>
             <Text color="gray.400">
               {item.name} •{' '}
@@ -112,14 +145,15 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
     );
   };
 
-  const keyExtractor = (item: DonationDetails) => item.name;
+  const keyExtractor = (item: DonationDetails, index: number) =>
+    `${item?.name}-${index}`;
 
   const { logo, name, description, address } = details;
 
   return (
     <>
       <FlatList
-        data={[{ name: 'asdf', amount: 5, date: '2022-10-13T12:26:14Z' }]}
+        data={donations}
         ListHeaderComponent={
           <NonProfitDetailsHeader
             logo={logo}
@@ -130,6 +164,7 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
         }
         renderItem={renderItem}
         keyExtractor={keyExtractor}
+        ListEmptyComponent={<Text textAlign={'center'}>No donations yet</Text>}
       />
       <Button
         _pressed={{ opacity: 0.8 }}

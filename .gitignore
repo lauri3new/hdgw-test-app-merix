@@ -65,3 +65,6 @@ buck-out/
 
 # .envs
 .env*
+
+# vscode
+.vscode/

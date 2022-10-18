@@ -21,7 +21,7 @@ export const NonProfitSearch = () => {
   const [resultsTotal, setResultsTotal] = useState();
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const debouncedHandleChange = debounce((text: string) => setQuery(text), 200);
+  const debouncedHandleChange = debounce((text: string) => setQuery(text), 300);
   const inputRef = useRef<TextInput>();
   const safeAreaProps = useSafeArea({ safeAreaTop: true });
 
