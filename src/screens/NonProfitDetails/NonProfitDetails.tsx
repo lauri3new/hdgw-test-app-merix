@@ -45,10 +45,6 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
   const [details, setDetails] = useState<INonProfitDetails>();
   const navigation = useNavigation<NavigationProp<RootStackParamsList>>();
   const [donations, setDonations] = useState<Array<DonationDetails>>([]);
-  console.log(
-    '🚀 ~ file: NonProfitDetails.tsx ~ line 46 ~ donations',
-    donations,
-  );
 
   useEffect(() => {
     const fetch = async () => {
@@ -71,13 +67,12 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
     const subscriber = firestore()
       .collection('donation')
       .where('data.eventData.organisationId', '==', id)
+      .where('data.eventData.userId', '==', TEST_USER_ID)
+      .orderBy('data.createdAt', 'desc')
       .onSnapshot(querySnapshot => {
         const data = querySnapshot.docs.map(doc => {
-          console.log(
-            '🚀 ~ file: NonProfitDetails.tsx ~ line 77 ~ data ~ doc.data().data',
-            doc.data().data,
-          );
           const item = doc.data().data;
+
           return {
             id: doc.id,
             name: item.eventData?.firstName || 'Anonymous',
@@ -86,10 +81,6 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
             currencyCode: item.eventData.currencyCode,
           };
         });
-        console.log(
-          '🚀 ~ file: NonProfitDetails.tsx ~ line 85 ~ data ~ data',
-          data,
-        );
 
         setDonations(data);
       });
@@ -102,7 +93,7 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
   }
 
   if (!details) {
-    return <Text>Couldn't load the data</Text>;
+    return <Text textAlign="center">Couldn't load the data</Text>;
   }
 
   const handleDonationPress = async () => {
@@ -169,10 +160,8 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
       <Button
         _pressed={{ opacity: 0.8 }}
         onPress={handleDonationPress}
-        position="absolute"
-        left={5}
-        right={5}
-        bottom={insets.bottom + 16}
+        mb={insets.bottom + 16}
+        mx={5}
         bgColor="blue.700"
         size="lg"
         borderRadius="xl"
