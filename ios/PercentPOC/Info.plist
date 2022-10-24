@@ -30,12 +30,12 @@
 		<false/>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>sandbox-donate.poweredbypercent.com</key>
+			<key>localhost</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
 			</dict>
-			<key>localhost</key>
+			<key>sandbox-donate.poweredbypercent.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
