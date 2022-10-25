@@ -1,1 +1,1 @@
-export const TEST_USER_ID = 'sandbox_user_000000CTgmzOgdxoLq1ad9M0QWYr2';
+export const TEST_USER_ID = 'sandbox_user_000000CU16G3yUaxazDqjgs1QRvay';
