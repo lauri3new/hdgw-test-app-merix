@@ -102,7 +102,7 @@ export const NonProfitDetails: React.FC<Props> = ({ route }) => {
       const response = await donationSessionRequest.post('/donation-sessions', {
         organisationId: details.id,
         language: 'en-GB',
-        currency: 'CHF',
+        currency: 'GBP',
         userId: TEST_USER_ID,
       });
 
