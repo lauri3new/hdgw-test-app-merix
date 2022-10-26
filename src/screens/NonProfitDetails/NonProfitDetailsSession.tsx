@@ -10,7 +10,7 @@ interface Props {
 const NonProfitDetailsSession: React.FC<Props> = ({ route }) => {
   const uri = route.params.uri;
 
-  return <WebView source={{ uri }} startInLoadingState />;
+  return <WebView source={{ uri }} startInLoadingState enableApplePay />;
 };
 
 export default NonProfitDetailsSession;
